@@ -2,6 +2,8 @@
 
 #include <Arduino_LED_Matrix.h>
 #include <zephyr/sys/atomic.h>
+#include <string.h>
+#include "battery_matrix.h"
 
 static atomic_t startupIpOctet = ATOMIC_INIT(-1);
 
@@ -32,19 +34,38 @@ static void renderIpOctet(Arduino_LED_Matrix& matrix, unsigned octet) {
 }
 
 // Called by the Arduino loop, outside the motion and Bridge threads.
+// The Wi-Fi IP suffix owns the matrix for 60 s after it arrives; otherwise the
+// matrix shows the battery gauge (battery_matrix.h).
 static void serviceStartupIpDisplay() {
   static Arduino_LED_Matrix matrix;
-  static bool shown = false, visible = false;
+  static bool begun = false, shown = false, ipVisible = false, blank = false;
   static uint32_t shownAt = 0;
+  static BatteryGauge gauge;
+  static uint8_t last[8][13] = {};
+  const uint32_t now = millis();
+  if (!begun) { matrix.begin(); matrix.clear(); begun = blank = true; }
+
   const int octet = atomic_get(&startupIpOctet);
   if (!shown && octet >= 0) {
-    matrix.begin();
     renderIpOctet(matrix, octet);
-    shownAt = millis();
-    shown = visible = true;
-  } else if (visible && uint32_t(millis() - shownAt) >= 60000u) {
-    matrix.clear();
-    matrix.end();
-    visible = false;
+    shownAt = now;
+    shown = ipVisible = true;
+    blank = false;
+  } else if (ipVisible && uint32_t(now - shownAt) >= 60000u) {
+    ipVisible = false;
+    memset(last, 0xff, sizeof(last));  // force a battery redraw
   }
+
+  gauge.update(now);
+  if (ipVisible) return;
+
+  uint8_t px[8][13];
+  if (!renderBattery(gauge, now, px)) {
+    if (!blank) { matrix.clear(); blank = true; }
+    return;
+  }
+  if (!blank && memcmp(px, last, sizeof(px)) == 0) return;
+  matrix.renderBitmap(px, 8, 13);
+  memcpy(last, px, sizeof(px));
+  blank = false;
 }

@@ -752,6 +752,7 @@ static void controlTask(void*, void*, void*) {
     diagnostic.reconnects = atomic_get(&bridgeReconnects);
     diagnostic.bridgeReadyUs = (uint32_t)atomic_get(&bridgeReadyUs);
     diagnostic.servoBusVoltageMv = servoBusVoltageMv();
+    publishBatteryMv(diagnostic.servoBusVoltageMv);
     k_mutex_lock(&stateMu, K_FOREVER);
     if (k_sem_count_get(&reportReady)) ++reportDrops;
     s.reportDrops = reportDrops; snapshot = s;
