@@ -79,14 +79,14 @@ struct BatteryGauge {
 };
 
 static void drawBatteryOutline(uint8_t (&px)[8][13]) {
-  for (unsigned c = 0; c <= 11; ++c) { px[0][c] = 1; px[7][c] = 1; }
-  for (unsigned r = 0; r <= 7; ++r) { px[r][0] = 1; px[r][11] = 1; }
-  for (unsigned r = 2; r <= 5; ++r) px[r][12] = 1;  // terminal
+  for (unsigned c = 1; c <= 12; ++c) { px[0][c] = 1; px[7][c] = 1; }
+  for (unsigned r = 0; r <= 7; ++r) { px[r][1] = 1; px[r][12] = 1; }
+  for (unsigned r = 2; r <= 5; ++r) px[r][0] = 1;  // terminal
 }
 
 static void drawBatteryBars(uint8_t (&px)[8][13], int bars) {
   for (int i = 0; i < bars && i < BATT_LEVELS; ++i)
-    for (unsigned r = 2; r <= 5; ++r) px[r][2 + i] = 1;  // interior cols 2..9
+    for (unsigned r = 2; r <= 5; ++r) px[r][12 - i] = 1;  // interior cols 2..9
 }
 
 static void drawBatteryWarning(uint8_t (&px)[8][13]) {
