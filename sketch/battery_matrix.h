@@ -86,7 +86,7 @@ static void drawBatteryOutline(uint8_t (&px)[8][13]) {
 
 static void drawBatteryBars(uint8_t (&px)[8][13], int bars) {
   for (int i = 0; i < bars && i < BATT_LEVELS; ++i)
-    for (unsigned r = 2; r <= 5; ++r) px[r][12 - i] = 1;  // interior cols 2..9
+    for (unsigned r = 2; r <= 5; ++r) px[r][12 - i] = 1;
 }
 
 static void drawBatteryWarning(uint8_t (&px)[8][13]) {
