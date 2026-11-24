@@ -18,7 +18,7 @@ static constexpr uint32_t BATT_EMPTY_MV = 7000;
 static constexpr uint32_t BATT_EMPTY_EXIT_MV = 7100;  // hysteresis
 static constexpr uint32_t BATT_DANGER_MV = 6500;
 static constexpr uint32_t BATT_DANGER_EXIT_MV = 6700; // hysteresis
-static constexpr int BATT_LEVELS = 8;
+static constexpr int BATT_LEVELS = 10;
 static constexpr uint32_t BATT_STALE_MS = 2000;
 
 // Written by the control thread, read by loop().
@@ -85,7 +85,7 @@ static void drawBatteryOutline(uint8_t (&px)[8][13]) {
 }
 
 static void drawBatteryBars(uint8_t (&px)[8][13], int bars) {
-  for (int i = 0; i < bars && i < BATT_LEVELS; ++i)
+  for (int i = 1; i <= bars && i <= BATT_LEVELS; ++i)
     for (unsigned r = 2; r <= 5; ++r) px[r][12 - i] = 1;
 }
 
