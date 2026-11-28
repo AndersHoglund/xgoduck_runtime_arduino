@@ -66,7 +66,7 @@ static void renderIpFrame(Arduino_LED_Matrix& matrix, int width, int left) {
 }
 
 // Called by the Arduino loop, outside the motion and Bridge threads.
-static void serviceStartupIpDisplay() {
+static boolean serviceStartupIpDisplay() {
   static Arduino_LED_Matrix matrix;
   static bool shown = false, visible = false;
   static int width = 0;
@@ -77,7 +77,7 @@ static void serviceStartupIpDisplay() {
     shownAt = millis();
     shown = visible = true;
   }
-  if (!visible) return;
+  if (!visible) return false;
   const uint32_t elapsed = millis() - shownAt;
   if (elapsed >= 30000u) {
     matrix.clear();
@@ -85,7 +85,7 @@ static void serviceStartupIpDisplay() {
     delay(2);
     matrix.end();
     visible = false;
-    return;
+    return false;
   }
 
   // The rightmost column enters first, with one blank frame between passes.
@@ -96,4 +96,5 @@ static void serviceStartupIpDisplay() {
     renderIpFrame(matrix, width, left);
     previousLeft = left;
   }
+  return true;
 }

@@ -9,6 +9,7 @@
 #include "uart_fifo.h"
 #include "tof_sensor.h"
 #include "ip_matrix.h"
+#include "battery_matrix.h"
 
 // The UNO Q core reinitializes this UART on each negotiated speed change.
 void duckEnableRouterFifo() {
@@ -1042,6 +1043,8 @@ void setup() {
   asm volatile("nop" ::: "memory");
 }
 void loop() {
-  serviceStartupIpDisplay();
+  if (!serviceStartupIpDisplay()) {
+    serviceBatteryGauge();
+  }
   delay(100);
 }
